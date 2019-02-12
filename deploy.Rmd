@@ -5,14 +5,14 @@ output: html_notebook
 
 This example is based on the instructions in the [RStudio Connect User Guide](https://docs.rstudio.com/connect/user/cookbook.html#cookbook-deploying). Code for this example can be found on [Github](https://github.com/nwstephens/connect-api).
 
-### Set your environment variables
+### 1. Check your environment variables
 
 ```{r}
 Sys.getenv("CONNECT_API_KEY")
 Sys.getenv("CONNECT_SERVER")
 ```
 
-### Get Placeholder
+### 2. Get Placeholder
 
 ```{bash}
 export DATA='{"name": "shakespeare4", "title": "Shakespeare Word Clouds"}'
@@ -22,7 +22,7 @@ curl --silent --show-error -L --max-redirs 0 --fail -X POST \
     "${CONNECT_SERVER}__api__/v1/experimental/content"
 ```
 
-### Set GUID
+#### Set GUID
 
 **Important**: Paste the value for *guid* from the previous step into *CONTENT_GUID* below.
 
@@ -30,7 +30,7 @@ curl --silent --show-error -L --max-redirs 0 --fail -X POST \
 Sys.setenv(CONTENT_GUID="04c1194d-9ade-4d5b-9299-49ff0b27b0de")
 ```
 
-### Bundle
+### 3. Bundle
 
 Bundle your content code and the manifest into a tarball.
 
@@ -38,7 +38,7 @@ Bundle your content code and the manifest into a tarball.
 tar czf bundle.tar.gz faithful/manifest.json faithful/app.R
 ```
 
-### Upload
+### 4. Upload
 
 Uplad the bundle to RStudio Connect.
 
@@ -49,7 +49,7 @@ curl --silent --show-error -L --max-redirs 0 --fail -X POST \
     "${CONNECT_SERVER}__api__/v1/experimental/content/${CONTENT_GUID}/upload"
 ```
 
-### Set Bundle ID
+#### Set Bundle ID
 
 **Important**: Paste the value for *bundle_id* from the previous step into *BUNDLE_ID* below.
 
@@ -57,7 +57,7 @@ curl --silent --show-error -L --max-redirs 0 --fail -X POST \
 Sys.setenv(BUNDLE_ID="24973")
 ```
 
-### Deploy
+### 5. Deploy
 
 Deploy the bundle on RStudio Connect. (Note: This code throws an error.)
 
