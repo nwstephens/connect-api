@@ -3,6 +3,8 @@ title: Deployment with RStudio Connect API
 output: html_notebook
 ---
 
+This example is based on the instructions in the [RStudio Connect User Guide](https://docs.rstudio.com/connect/user/cookbook.html#cookbook-deploying).
+
 ### Set your environment variables
 
 ```{r}
