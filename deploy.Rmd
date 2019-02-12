@@ -1,0 +1,71 @@
+---
+title: Deployment with RStudio Connect API
+output: html_notebook
+---
+
+### Set your environment variables
+
+```{r}
+Sys.getenv("CONNECT_API_KEY")
+Sys.getenv("CONNECT_SERVER")
+```
+
+### Get Placeholder
+
+```{bash}
+export DATA='{"name": "shakespeare4", "title": "Shakespeare Word Clouds"}'
+curl --silent --show-error -L --max-redirs 0 --fail -X POST \
+    -H "Authorization: Key ${CONNECT_API_KEY}" \
+    --data "${DATA}" \
+    "${CONNECT_SERVER}__api__/v1/experimental/content"
+```
+
+### Set GUID
+
+**Important**: Paste the value for *guid* from the previous step into *CONTENT_GUID* below.
+
+```{r}
+Sys.setenv(CONTENT_GUID="04c1194d-9ade-4d5b-9299-49ff0b27b0de")
+```
+
+### Bundle
+
+Bundle your content code and the manifest into a tarball.
+
+```{bash}
+tar czf bundle.tar.gz faithful/manifest.json faithful/app.R
+```
+
+### Upload
+
+Uplad the bundle to RStudio Connect.
+
+```{bash}
+curl --silent --show-error -L --max-redirs 0 --fail -X POST \
+    -H "Authorization: Key ${CONNECT_API_KEY}" \
+    --data-binary @"bundle.tar.gz" \
+    "${CONNECT_SERVER}__api__/v1/experimental/content/${CONTENT_GUID}/upload"
+```
+
+### Set Bundle ID
+
+**Important**: Paste the value for *bundle_id* from the previous step into *BUNDLE_ID* below.
+
+```{r}
+Sys.setenv(BUNDLE_ID="24973")
+```
+
+### Deploy
+
+Deploy the bundle on RStudio Connect. (Note: This code throws an error.)
+
+```{bash}
+curl --silent --show-error -L --max-redirs 0 --fail -X POST \
+    -H "Authorization: Key ${CONNECT_API_KEY}" \
+    --data '{"bundle_id":"'"${BUNDLE_ID}"'"}' \
+    "${CONNECT_SERVER}__api__/v1/experimental/content/${CONTENT_GUID}/deploy"
+```
+
+
+
+
