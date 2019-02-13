@@ -1,0 +1,156 @@
+---
+title: Deployment with RStudio Connect API
+output: html_notebook
+params:
+    name: static2
+---
+
+This example is based on the instructions in the [RStudio Connect User Guide](https://docs.rstudio.com/connect/user/cookbook.html#cookbook-deploying). Code for this example can be found on [Github](https://github.com/nwstephens/connect-api).
+
+### Deployment Process
+
+The deployment strategy is to describe the development environment with a manifest and then recreate the environment after it bundle is deployed to RStudio Connect.
+
+#### Overview
+
+1. Describe the environment
+    * `Rscript -e 'rsconnect::writeManifest()'`
+2. Upload the bundle
+    * `POST /content` -- Retrieve a guid
+    * `tar` -- Tar the bundle
+    * `POST /upload` -- Upload the bundle: 
+3. Recreate the environment
+    * `POST /deploy`
+
+#### Inputs
+
+* `CONNECT_API_KEY`: Publishers and admins can request an API key from the RStudio Connect UI. See the [user guide](https://docs.rstudio.com/connect/user/cookbook.html#cookbook-configuring-your-scripts) for more information. 
+* `CONNECT_SERVER`: This is the URL for your server. (e.g. "https://connect.example.com/").
+* `name`: A unique identifier for the content that is defined by the user.
+
+#### Outputs
+
+* `guid`: A unique identifier for the content that is defined by the system.
+* `bundle_id`: A unique identifier for the content that is used in the content URL.
+* `task_id`: An identifier for the completed deployment process.
+
+### Check your environment variables
+
+For convenience in later steps, set the inputs as environment variables.
+
+```{r, include = FALSE}
+Sys.setenv(NAME = params$name)
+Sys.getenv("CONNECT_API_KEY")
+Sys.getenv("CONNECT_SERVER")
+```
+
+
+### 1. Recreate your environment
+
+The manifest defines your development environment. In includes things like:
+
+* R Version
+* R Packages
+
+```{r}
+rsconnect::writeManifest(appFiles = "static-doc.html")
+```
+
+### 2. Get Placeholder
+
+Set a globally unique identifier that will act as a placeholder for your content.
+
+API call
+
+* Endpoint: `POST /content`
+* Inputs: `CONNECT_API_KEY`, `CONNECT_SERVER`, `name`
+* Output: `guid`
+
+```{bash}
+curl --silent --show-error -L --max-redirs 0 --fail -X POST \
+    -H "Authorization: Key ${CONNECT_API_KEY}" \
+    --data '{"name": "'"${NAME}"'"}' \
+    "${CONNECT_SERVER}__api__/v1/experimental/content"
+```
+
+
+#### Set GUID
+
+**Important**: Paste the value for *guid* from the previous step into *CONTENT_GUID* below.
+
+```{r}
+Sys.setenv(CONTENT_GUID="2d274110-073e-4ebe-a656-0c700c269403")
+```
+
+### 3. Bundle
+
+Bundle your content code and the manifest into a tarball.
+
+```{bash}
+tar -czf bundle.tar.gz manifest.json static-doc.html
+```
+
+### 4. Upload
+
+Uplad the bundle to RStudio Connect.
+
+API call
+
+* Endpoint: `POST /upload`
+* Inputs: `CONNECT_API_KEY`, `CONNECT_SERVER`, `CONTENT_GUID`
+* Output: `bundle_id`
+
+```{bash}
+curl --silent --show-error -L --max-redirs 0 --fail -X POST \
+    -H "Authorization: Key ${CONNECT_API_KEY}" \
+    --data-binary @"bundle.tar.gz" \
+    "${CONNECT_SERVER}__api__/v1/experimental/content/${CONTENT_GUID}/upload"
+```
+
+#### Set Bundle ID
+
+**Important**: Paste the value for *bundle_id* from the previous step into *BUNDLE_ID* below.
+
+```{r}
+Sys.setenv(BUNDLE_ID="25020")
+```
+
+### 5. Deploy
+
+Deploy the bundle on RStudio Connect. (Note: This code throws an error.)
+
+API call
+
+* Endpoint: `POST /deploy`
+* Inputs: `CONNECT_API_KEY`, `CONNECT_SERVER`, `CONTENT_GUID`, `BUNDLE_ID`
+* Output: `task_id`
+
+```{bash}
+curl --silent --show-error -L --max-redirs 0 --fail -X POST \
+    -H "Authorization: Key ${CONNECT_API_KEY}" \
+    --data '{"bundle_id":"'"${BUNDLE_ID}"'"}' \
+    "${CONNECT_SERVER}__api__/v1/experimental/content/${CONTENT_GUID}/deploy"
+```
+
+#### Set Task ID
+
+```{r}
+Sys.setenv(TASK="BN6s6COwXA9koYsj")
+```
+
+
+### 6. Verify deployment
+
+Verify that the bundle finished. Use `first` to define what part of the output you would like to capture (`first=0` by default).
+
+```{bash}
+curl --silent --show-error -L --max-redirs 0 --fail \
+    -H "Authorization: Key ${CONNECT_API_KEY}" \
+    "${CONNECT_SERVER}__api__/v1/experimental/tasks/${TASK}?wait=1&first=0"
+```
+
+#### Open URL
+
+* [Open in UI](`r paste0(Sys.getenv("CONNECT_SERVER"), "connect/#/apps/", Sys.getenv("CONTENT_GUID"))`)
+
+* [Open solo](`r paste0(Sys.getenv("CONNECT_SERVER"), "content/", Sys.getenv("CONTENT_GUID"))`)

@@ -1,0 +1,22 @@
+---
+title: "RStudio Connect API Example"
+---
+
+### Inputs
+
+```{r}
+key <- Sys.getenv("CONNECT_API_KEY")
+server <- Sys.getenv("CONNECT_SERVER")
+```
+
+### R version API
+
+```{r}
+url <- paste0(server, "__api__/v1/server_settings/r")
+config <- httr::add_headers(Authorization = paste("Key", key))
+httr::GET(url, config)
+```
+
+### Background: API Keys
+
+API Keys are associated with user accounts. They provide roughly the same level of access to RStudio Connect as a user logged in via the browser would have. See section 13.5.1 of the Connect [admin guide](https://docs.rstudio.com/connect/admin/content-management.html#how-this-works-1).
