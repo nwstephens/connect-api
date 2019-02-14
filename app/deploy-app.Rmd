@@ -1,5 +1,5 @@
 ---
-title: Deployment with RStudio Connect API
+title: Deployments using RStudio Connect APIs
 output: 
   html_notebook:
     toc: true
@@ -23,9 +23,9 @@ The deployment strategy is to describe the development environment with a manife
 
 1. Describe the environment
     * `rsconnect::writeManifest()` - Create manifest
-2. Upload the bundle
+2. Bundle and ship
     * `tar` -- Bundle all the files
-    * `POST /content` -- Retrieve a guid
+    * `POST /content` -- Retrieve a placeholder
     * `POST /upload` -- Upload the bundle 
 3. Recreate the environment
     * `POST /deploy` -- Deploy the bundle
@@ -33,7 +33,7 @@ The deployment strategy is to describe the development environment with a manife
 
 #### Inputs
 
-You will need to supply three inputs. For convenience in later steps, set the inputs as environment variables.
+You will need to supply three inputs. For convenience in later steps you should **set these inputs as environment variables**.
 
 ```{r, include = FALSE}
 Sys.setenv(NAME = params$name)
@@ -55,7 +55,7 @@ Each API returns an identifier that is used in the next API call.
 
 ***
 
-### 1. Describe your environment
+### 1. Describe the environment
 
 ***
 
@@ -69,11 +69,11 @@ rsconnect::writeManifest(appFiles = "app.R")
 
 ***
 
-### 2. Upload the bundle
+### 2. Bundle and ship
 
 ***
 
-#### Tar the file
+#### Bundle all the files
 
 Bundle your content code and the manifest into a tarball.
 
@@ -81,7 +81,7 @@ Bundle your content code and the manifest into a tarball.
 tar -czf bundle.tar.gz manifest.json app.R
 ```
 
-#### Get a placeholder
+#### Retrieve a placeholder
 
 Using the `POST /content` API, retrieve a globally unique identifier that will act as a placeholder for your content.
 
@@ -95,6 +95,10 @@ curl --silent --show-error -L --max-redirs 0 --fail -X POST \
     "${CONNECT_SERVER}__api__/v1/experimental/content"
 ```
 
+```{r include=FALSE}
+Sys.setenv(CONTENT_GUID="14593e7a-9e8b-47e5-b4a1-a1d7bb3e6a6f")
+```
+
 #### Upload the bundle
 
 Using the `POST /upload` API, upload the bundle to RStudio Connect.
@@ -102,15 +106,15 @@ Using the `POST /upload` API, upload the bundle to RStudio Connect.
 * Inputs: `CONNECT_API_KEY`, `CONNECT_SERVER`, `CONTENT_GUID`
 * Output: `bundle_id`
 
-```{r}
-Sys.setenv(CONTENT_GUID="14593e7a-9e8b-47e5-b4a1-a1d7bb3e6a6f")
-```
-
 ```{bash}
 curl --silent --show-error -L --max-redirs 0 --fail -X POST \
     -H "Authorization: Key ${CONNECT_API_KEY}" \
     --data-binary @"bundle.tar.gz" \
     "${CONNECT_SERVER}__api__/v1/experimental/content/${CONTENT_GUID}/upload"
+```
+
+```{r include=FALSE}
+Sys.setenv(BUNDLE_ID="25048")
 ```
 
 ***
@@ -126,10 +130,6 @@ Using the `POST /deploy`, deploy the bundle on RStudio Connect.
 * Inputs: `CONNECT_API_KEY`, `CONNECT_SERVER`, `CONTENT_GUID`, `BUNDLE_ID`
 * Output: `task_id`
 
-```{r}
-Sys.setenv(BUNDLE_ID="25048")
-```
-
 ```{bash}
 curl --silent --show-error -L --max-redirs 0 --fail -X POST \
     -H "Authorization: Key ${CONNECT_API_KEY}" \
@@ -137,13 +137,13 @@ curl --silent --show-error -L --max-redirs 0 --fail -X POST \
     "${CONNECT_SERVER}__api__/v1/experimental/content/${CONTENT_GUID}/deploy"
 ```
 
+```{r include=FALSE}
+Sys.setenv(TASK="VSM5rrSv0kkOStMn")
+```
+
 #### Verify the deployment
 
 Verify that the bundle finished. Use `first` to define what part of the output you would like to capture (`first=0` by default).
-
-```{r}
-Sys.setenv(TASK="VSM5rrSv0kkOStMn")
-```
 
 ```{bash}
 curl --silent --show-error -L --max-redirs 0 --fail \
