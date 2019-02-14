@@ -1,15 +1,20 @@
 ---
-title: "RStudio Connect API Example"
+title: "RStudio Connect API"
+subtitle: "An Example"
 ---
 
 ### Inputs
+
+You will need an API key `CONNECT_API_KEY` and the name of the RStudio Connect server `CONNECT_SERVER` in order to interact with the RStudio Connect API. API Keys are associated with user accounts. They provide roughly the same level of access to RStudio Connect as a user logged in via the browser would have. See section 13.5.1 of the Connect [admin guide](https://docs.rstudio.com/connect/admin/content-management.html#how-this-works-1). The name of the RStudio Connect server will look like: `https://connect.example.com/`.
 
 ```{r}
 key <- Sys.getenv("CONNECT_API_KEY")
 server <- Sys.getenv("CONNECT_SERVER")
 ```
 
-### R version API
+### Connect API
+
+The `server_settings/r` APIs will return a list of all the installed R versions on RStudio Connect. Pass the `CONNECT_API_KEY` and `CONNECT_SERVER` inputs to see which versions of R are installed.
 
 ```{r}
 url <- paste0(server, "__api__/v1/server_settings/r")
@@ -17,6 +22,4 @@ config <- httr::add_headers(Authorization = paste("Key", key))
 httr::GET(url, config)
 ```
 
-### Background: API Keys
 
-API Keys are associated with user accounts. They provide roughly the same level of access to RStudio Connect as a user logged in via the browser would have. See section 13.5.1 of the Connect [admin guide](https://docs.rstudio.com/connect/admin/content-management.html#how-this-works-1).

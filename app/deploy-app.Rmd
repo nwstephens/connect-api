@@ -53,6 +53,10 @@ Each API returns an identifier that is used in the next API call.
 * `bundle_id`: A unique identifier for the version of content that is used in the content URL.
 * `task_id`: An identifier for the completed deployment process.
 
+#### Before you begin
+
+Set your working directory to the app directory. Deployments work better when the all commands and API calls are issued within the app directory.
+
 ***
 
 ### 1. Describe the environment
@@ -66,6 +70,8 @@ The manifest defines your development environment. This is done with an R functi
 ```{r}
 rsconnect::writeManifest(appFiles = "app.R")
 ```
+
+The manifest is written to `manifest.json` in your app directory.
 
 ***
 
@@ -81,6 +87,8 @@ Bundle your content code and the manifest into a tarball.
 tar -czf bundle.tar.gz manifest.json app.R
 ```
 
+Your code and the manifest are stored in `bundle.tar.gz`.
+
 #### Retrieve a placeholder
 
 Using the `POST /content` API, retrieve a globally unique identifier that will act as a placeholder for your content.
@@ -94,6 +102,8 @@ curl --silent --show-error -L --max-redirs 0 --fail -X POST \
     --data '{"name": "'"${NAME}"'"}' \
     "${CONNECT_SERVER}__api__/v1/experimental/content"
 ```
+
+Save the output for `guid` with the `CONTENT_GUID` environment variable.
 
 ```{r include=FALSE}
 Sys.setenv(CONTENT_GUID="86902d4d-3bca-4aae-84a8-101781d7fcfd")
@@ -112,6 +122,8 @@ curl --silent --show-error -L --max-redirs 0 --fail -X POST \
     --data-binary @"bundle.tar.gz" \
     "${CONNECT_SERVER}__api__/v1/experimental/content/${CONTENT_GUID}/upload"
 ```
+
+Save the output for `bundle_id` with the `BUNDLE_ID` environment variable.
 
 ```{r include=FALSE}
 Sys.setenv(BUNDLE_ID="25054")
@@ -136,6 +148,8 @@ curl --silent --show-error -L --max-redirs 0 --fail -X POST \
     --data '{"bundle_id":"'"${BUNDLE_ID}"'"}' \
     "${CONNECT_SERVER}__api__/v1/experimental/content/${CONTENT_GUID}/deploy"
 ```
+
+Save the output for `task_id` with the `TASK` environment variable.
 
 ```{r include=FALSE}
 Sys.setenv(TASK="ODNZzhYvboNrwvRb")
