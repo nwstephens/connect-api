@@ -1,42 +1,38 @@
 ---
 title: Deployment with RStudio Connect API
-output: html_notebook
+output: 
+  html_notebook:
+    toc: true
+    toc_float: true
 params:
-    name: dynamic4
+  name: dynamic7
 ---
 
 This example is based on the instructions in the [RStudio Connect User Guide](https://docs.rstudio.com/connect/user/cookbook.html#cookbook-deploying). Code for this example can be found on [Github](https://github.com/nwstephens/connect-api).
 
+***
+
 ### Deployment Process
 
+***
+
 The deployment strategy is to describe the development environment with a manifest and then recreate the environment after it bundle is deployed to RStudio Connect.
+
 
 #### Overview
 
 1. Describe the environment
     * `Rscript -e 'rsconnect::writeManifest()'`
 2. Upload the bundle
-    * `POST /content` -- Retrieve a guid
     * `tar` -- Tar the bundle
+    * `POST /content` -- Retrieve a guid
     * `POST /upload` -- Upload the bundle: 
 3. Recreate the environment
     * `POST /deploy`
 
 #### Inputs
 
-* `CONNECT_API_KEY`: Publishers and admins can request an API key from the RStudio Connect UI. See the [user guide](https://docs.rstudio.com/connect/user/cookbook.html#cookbook-configuring-your-scripts) for more information. 
-* `CONNECT_SERVER`: This is the URL for your server. (e.g. "https://connect.example.com/").
-* `name`: A unique identifier for the content that is defined by the user.
-
-#### Outputs
-
-* `guid`: A unique identifier for the content that is defined by the system.
-* `bundle_id`: A unique identifier for the content that is used in the content URL.
-* `task_id`: An identifier for the completed deployment process.
-
-### Check your environment variables
-
-For convenience in later steps, set the inputs as environment variables.
+You will need to supply three inputs. For convenience in later steps, set the inputs as environment variables.
 
 ```{r, include = FALSE}
 Sys.setenv(NAME = params$name)
@@ -44,25 +40,52 @@ Sys.getenv("CONNECT_API_KEY")
 Sys.getenv("CONNECT_SERVER")
 ```
 
-### 1. Recreate your environment
+* `CONNECT_API_KEY`: Publishers and admins can request an API key from the RStudio Connect UI. See the [user guide](https://docs.rstudio.com/connect/user/cookbook.html#cookbook-configuring-your-scripts) for more information. 
+* `CONNECT_SERVER`: This is the URL for your server. (e.g. "https://connect.example.com/").
+* `name`: A unique identifier for the content that is defined by the user.
 
-The manifest defines your development environment. In includes things like:
+#### Outputs
 
-* R Version
-* R Packages
+Each API returns an identifier that is used in the next API call.
+
+* `guid`: A unique identifier for the content that is defined by the system.
+* `bundle_id`: A unique identifier for the version of content that is used in the content URL.
+* `task_id`: An identifier for the completed deployment process.
+
+***
+
+### 1. Describe your environment
+
+***
+
+#### Manifest
+
+The manifest defines your development environment. This is done with an R function. The manifest includes things like your R version and package information.
 
 ```{r}
 rsconnect::writeManifest(appFiles = "app.R")
 ```
 
-### 2. Get Placeholder
+***
 
-Set a globally unique identifier that will act as a placeholder for your content.
+### 2. Upload the bundle
 
-API call
+***
 
-* Endpoint: `POST /content`
+#### Tar the file
+
+Bundle your content code and the manifest into a tarball.
+
+```{bash}
+tar -czf bundle.tar.gz manifest.json app.R
+```
+
+#### Get a placeholder
+
+Using the `POST /content` API, retrieve a globally unique identifier that will act as a placeholder for your content.
+
 * Inputs: `CONNECT_API_KEY`, `CONNECT_SERVER`, `name`
+* Output: `CONTENT_GUID`
 
 ```{bash}
 curl --silent --show-error -L --max-redirs 0 --fail -X POST \
@@ -71,31 +94,16 @@ curl --silent --show-error -L --max-redirs 0 --fail -X POST \
     "${CONNECT_SERVER}__api__/v1/experimental/content"
 ```
 
-#### Set GUID
+#### Upload the bundle
 
-**Important**: Paste the value for *guid* from the previous step into *CONTENT_GUID* below.
+Using the `POST /upload` API, upload the bundle to RStudio Connect.
 
-```{r}
-Sys.setenv(CONTENT_GUID="88ac5df9-d19e-4335-8d84-85b5c213ce67")
-```
-
-### 3. Bundle
-
-Bundle your content code and the manifest into a tarball.
-
-```{bash}
-tar -czf bundle.tar.gz manifest.json app.R
-```
-
-### 4. Upload
-
-Uplad the bundle to RStudio Connect.
-
-API call
-
-* Endpoint: `POST /upload`
 * Inputs: `CONNECT_API_KEY`, `CONNECT_SERVER`, `CONTENT_GUID`
 * Output: `bundle_id`
+
+```{r}
+Sys.setenv(CONTENT_GUID="3ea9753c-38c8-49e6-90ec-896f13bb7e75")
+```
 
 ```{bash}
 curl --silent --show-error -L --max-redirs 0 --fail -X POST \
@@ -104,23 +112,22 @@ curl --silent --show-error -L --max-redirs 0 --fail -X POST \
     "${CONNECT_SERVER}__api__/v1/experimental/content/${CONTENT_GUID}/upload"
 ```
 
-#### Set Bundle ID
+***
 
-**Important**: Paste the value for *bundle_id* from the previous step into *BUNDLE_ID* below.
+### 3. Recreate the environment
 
-```{r}
-Sys.setenv(BUNDLE_ID="25033")
-```
+***
 
-### 5. Deploy
+#### Deploy the bundle
 
-Deploy the bundle on RStudio Connect. (Note: This code throws an error.)
+Using the `POST /deploy`, deploy the bundle on RStudio Connect.
 
-API call
-
-* Endpoint: `POST /deploy`
 * Inputs: `CONNECT_API_KEY`, `CONNECT_SERVER`, `CONTENT_GUID`, `BUNDLE_ID`
 * Output: `task_id`
+
+```{r}
+Sys.setenv(BUNDLE_ID="25041")
+```
 
 ```{bash}
 curl --silent --show-error -L --max-redirs 0 --fail -X POST \
@@ -129,16 +136,13 @@ curl --silent --show-error -L --max-redirs 0 --fail -X POST \
     "${CONNECT_SERVER}__api__/v1/experimental/content/${CONTENT_GUID}/deploy"
 ```
 
-#### Set Task ID
-
-```{r}
-Sys.setenv(TASK="tQqalAPkd35vMD4I")
-```
-
-
-### 6. Verify deployment
+#### Verify the deployment
 
 Verify that the bundle finished. Use `first` to define what part of the output you would like to capture (`first=0` by default).
+
+```{r}
+Sys.setenv(TASK="m7i4EQSRFFmwZT0L")
+```
 
 ```{bash}
 curl --silent --show-error -L --max-redirs 0 --fail \
@@ -146,11 +150,11 @@ curl --silent --show-error -L --max-redirs 0 --fail \
     "${CONNECT_SERVER}__api__/v1/experimental/tasks/${TASK}?wait=1&first=0"
 ```
 
-#### Open URL
+#### Open in RStudio Connect
+
+Congratulations! Click the links to open the deployed assets in RStudio Connect.
 
 * [Open in UI](`r paste0(Sys.getenv("CONNECT_SERVER"), "connect/#/apps/", Sys.getenv("CONTENT_GUID"))`)
-
 * [Open solo](`r paste0(Sys.getenv("CONNECT_SERVER"), "content/", Sys.getenv("CONTENT_GUID"))`)
-
 
 

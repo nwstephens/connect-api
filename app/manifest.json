@@ -12,7 +12,7 @@
   "packages": {
     "BH": {
       "Source": "RSPM",
-      "Repository": null,
+      "Repository": "http://demo.rstudiopm.com/cran/latest",
       "description": {
         "Package": "BH",
         "Type": "Package",
@@ -33,7 +33,7 @@
     },
     "R6": {
       "Source": "RSPM",
-      "Repository": null,
+      "Repository": "http://demo.rstudiopm.com/cran/latest",
       "description": {
         "Package": "R6",
         "Title": "Classes with Reference Semantics",
@@ -58,7 +58,7 @@
     },
     "Rcpp": {
       "Source": "RSPM",
-      "Repository": null,
+      "Repository": "http://demo.rstudiopm.com/cran/latest",
       "description": {
         "Package": "Rcpp",
         "Title": "Seamless R and C++ Integration",
@@ -85,7 +85,7 @@
     },
     "crayon": {
       "Source": "RSPM",
-      "Repository": null,
+      "Repository": "http://demo.rstudiopm.com/cran/latest",
       "description": {
         "Package": "crayon",
         "Title": "Colored Terminal Output",
@@ -112,7 +112,7 @@
     },
     "digest": {
       "Source": "RSPM",
-      "Repository": null,
+      "Repository": "http://demo.rstudiopm.com/cran/latest",
       "description": {
         "Package": "digest",
         "Author": "Dirk Eddelbuettel <edd@debian.org> with contributions \n by Antoine Lucas, Jarek Tuszynski, Henrik Bengtsson, Simon Urbanek,\n Mario Frasca, Bryan Lewis, Murray Stokely, Hannes Muehleisen,\n Duncan Murdoch, Jim Hester, Wush Wu, Qiang Kou, Thierry Onkelinx, \n Michel Lang, Viliam Simko, Kurt Hornik and Radford Neal.",
@@ -136,7 +136,7 @@
     },
     "htmltools": {
       "Source": "RSPM",
-      "Repository": null,
+      "Repository": "http://demo.rstudiopm.com/cran/latest",
       "description": {
         "Package": "htmltools",
         "Type": "Package",
@@ -164,7 +164,7 @@
     },
     "httpuv": {
       "Source": "RSPM",
-      "Repository": null,
+      "Repository": "http://demo.rstudiopm.com/cran/latest",
       "description": {
         "Package": "httpuv",
         "Type": "Package",
@@ -191,7 +191,7 @@
     },
     "jsonlite": {
       "Source": "RSPM",
-      "Repository": null,
+      "Repository": "http://demo.rstudiopm.com/cran/latest",
       "description": {
         "Package": "jsonlite",
         "Version": "1.6",
@@ -215,7 +215,7 @@
     },
     "later": {
       "Source": "RSPM",
-      "Repository": null,
+      "Repository": "http://demo.rstudiopm.com/cran/latest",
       "description": {
         "Package": "later",
         "Type": "Package",
@@ -242,7 +242,7 @@
     },
     "magrittr": {
       "Source": "RSPM",
-      "Repository": null,
+      "Repository": "http://demo.rstudiopm.com/cran/latest",
       "description": {
         "Package": "magrittr",
         "Type": "Package",
@@ -264,7 +264,7 @@
     },
     "mime": {
       "Source": "RSPM",
-      "Repository": null,
+      "Repository": "http://demo.rstudiopm.com/cran/latest",
       "description": {
         "Package": "mime",
         "Type": "Package",
@@ -290,7 +290,7 @@
     },
     "promises": {
       "Source": "RSPM",
-      "Repository": null,
+      "Repository": "http://demo.rstudiopm.com/cran/latest",
       "description": {
         "Package": "promises",
         "Type": "Package",
@@ -319,7 +319,7 @@
     },
     "rlang": {
       "Source": "RSPM",
-      "Repository": null,
+      "Repository": "http://demo.rstudiopm.com/cran/latest",
       "description": {
         "Package": "rlang",
         "Version": "0.3.1",
@@ -347,7 +347,7 @@
     },
     "shiny": {
       "Source": "RSPM",
-      "Repository": null,
+      "Repository": "http://demo.rstudiopm.com/cran/latest",
       "description": {
         "Package": "shiny",
         "Type": "Package",
@@ -374,7 +374,7 @@
     },
     "sourcetools": {
       "Source": "RSPM",
-      "Repository": null,
+      "Repository": "http://demo.rstudiopm.com/cran/latest",
       "description": {
         "Package": "sourcetools",
         "Type": "Package",
@@ -399,7 +399,7 @@
     },
     "xtable": {
       "Source": "RSPM",
-      "Repository": null,
+      "Repository": "http://demo.rstudiopm.com/cran/latest",
       "description": {
         "Package": "xtable",
         "Version": "1.8-3",
@@ -476,7 +476,7 @@
       "checksum": "806d7d7a6dc4792fb5cb0f0a9c11bd3a"
     },
     "packrat/packrat.lock": {
-      "checksum": "00cdadb9e2c5eb2a3ac99d0bf072162f"
+      "checksum": "9c0f5ad2ab60dc894ec376b6eb7f82ce"
     }
   },
   "users": null
