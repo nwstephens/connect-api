@@ -22,13 +22,14 @@ The deployment strategy is to describe the development environment with a manife
 #### Overview
 
 1. Describe the environment
-    * `Rscript -e 'rsconnect::writeManifest()'`
+    * `rsconnect::writeManifest()` - Create manifest
 2. Upload the bundle
     * `tar` -- Bundle all the files
     * `POST /content` -- Retrieve a guid
     * `POST /upload` -- Upload the bundle 
 3. Recreate the environment
-    * `POST /deploy`
+    * `POST /deploy` -- Deploy the bundle
+    * `/tasks` -- Verify deployment
 
 #### Inputs
 
