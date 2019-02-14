@@ -5,7 +5,7 @@ output:
     toc: true
     toc_float: true
 params:
-  name: dynamic7
+  name: dynamic8
 ---
 
 This example is based on the instructions in the [RStudio Connect User Guide](https://docs.rstudio.com/connect/user/cookbook.html#cookbook-deploying). Code for this example can be found on [Github](https://github.com/nwstephens/connect-api).
@@ -24,9 +24,9 @@ The deployment strategy is to describe the development environment with a manife
 1. Describe the environment
     * `Rscript -e 'rsconnect::writeManifest()'`
 2. Upload the bundle
-    * `tar` -- Tar the bundle
+    * `tar` -- Bundle all the files
     * `POST /content` -- Retrieve a guid
-    * `POST /upload` -- Upload the bundle: 
+    * `POST /upload` -- Upload the bundle 
 3. Recreate the environment
     * `POST /deploy`
 
@@ -102,7 +102,7 @@ Using the `POST /upload` API, upload the bundle to RStudio Connect.
 * Output: `bundle_id`
 
 ```{r}
-Sys.setenv(CONTENT_GUID="3ea9753c-38c8-49e6-90ec-896f13bb7e75")
+Sys.setenv(CONTENT_GUID="14593e7a-9e8b-47e5-b4a1-a1d7bb3e6a6f")
 ```
 
 ```{bash}
@@ -126,7 +126,7 @@ Using the `POST /deploy`, deploy the bundle on RStudio Connect.
 * Output: `task_id`
 
 ```{r}
-Sys.setenv(BUNDLE_ID="25041")
+Sys.setenv(BUNDLE_ID="25048")
 ```
 
 ```{bash}
@@ -141,7 +141,7 @@ curl --silent --show-error -L --max-redirs 0 --fail -X POST \
 Verify that the bundle finished. Use `first` to define what part of the output you would like to capture (`first=0` by default).
 
 ```{r}
-Sys.setenv(TASK="m7i4EQSRFFmwZT0L")
+Sys.setenv(TASK="VSM5rrSv0kkOStMn")
 ```
 
 ```{bash}
