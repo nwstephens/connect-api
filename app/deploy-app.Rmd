@@ -1,14 +1,14 @@
 ---
-title: Deployments using RStudio Connect APIs
+title: RStudio Connect API Tutorial
 output: 
   html_notebook:
     toc: true
     toc_float: true
-params:
-  name: dynamic9
 ---
 
-This example is based on the instructions in the [RStudio Connect User Guide](https://docs.rstudio.com/connect/user/cookbook.html#cookbook-deploying). Code for this example can be found on [Github](https://github.com/nwstephens/connect-api).
+You can use the RStudio Connect APIs to programmatically publish your content. This tutorial gives step-by-step instructions on how to use the RStudio Connect APIs. Code can be found on [here](https://github.com/nwstephens/connect-api). 
+
+For more information on using the RStudio Connect APIs in an actual workflow (e.g. using Docker, Travis, Jenkins, etc.) see the overview at [Programmatic Deployments with Content Management APIs](https://solutions.rstudio.com/deploy/deploy/), an example on [Deploying with APIs](https://github.com/rstudio/connect-api-deploy-shiny), and the [RStudio Connect User Guide](https://docs.rstudio.com/connect/user/cookbook.html#cookbook-deploying).
 
 ***
 
@@ -16,36 +16,48 @@ This example is based on the instructions in the [RStudio Connect User Guide](ht
 
 ***
 
-The deployment strategy is to describe the development environment with a manifest and then recreate the environment after it bundle is deployed to RStudio Connect.
+The deployment process has three steps: Build, upload, and deploy the content bundle. The content bundle contains all your content and a description of your development environment. The overall strategy in deployments is to recreate your development environment in isolation on RStudio Connect.
 
+![](diagram.png)
+
+Your can describe your development environment by creating a manifest in R. The `rsconnect::writeManifest()` function will automatically generate the manifest. The manifest includes a list of the relevant source code, package dependencies, and other metadata including the R version, the locale, the app mode, content category, etc. When you deploy the content bundle, RStudio Connect will parse the manifest and restore the environment. 
+
+The RStudio Connect APIs help you upload and deploy content programmatically. In this tutorial we will use `bash` and `curl` to interact with the APIs.
 
 #### Overview
 
-1. Describe the environment
+1. Build the bundle
     * `rsconnect::writeManifest()` - Create manifest
-2. Bundle and ship
     * `tar` -- Bundle all the files
-    * `POST /content` -- Retrieve a placeholder
+2. Upload the bundle
+    * `POST /content` -- Retrieve a guid
     * `POST /upload` -- Upload the bundle 
-3. Recreate the environment
+3. Deploy the bundle
     * `POST /deploy` -- Deploy the bundle
-    * `/tasks` -- Verify deployment
+    * `GET /tasks` -- Verify deployment
 
-#### Inputs
+#### Bundle
 
-You will need to supply three inputs. For convenience in later steps you should **set these inputs as environment variables**.
+The bundle is a tarball that contains the R code, other data files, and the manifest. You can create the manifest in R using the `rsconnect::writeManifest()` function.
+
+* R code and other data files: These content files (e.g. apps and docs) that you want to publish.
+* Manifest: This file describes the environment (e.g. content type, R packages, and R version) that you want to recreate for the published content. 
+
+#### API Inputs
+
+You will need to supply three inputs to the API's. For convenience in later steps you should **set these inputs as environment variables**.
 
 ```{r, include = FALSE}
-Sys.setenv(NAME = params$name)
-Sys.getenv("CONNECT_API_KEY")
-Sys.getenv("CONNECT_SERVER")
+Sys.setenv(NAME = "dynamic12")
+# Sys.setenv(CONNECT_API_KEY = "********************************")
+# Sys.setenv(CONNECT_SERVER = "https://connect.example.com/")
 ```
 
 * `CONNECT_API_KEY`: Publishers and admins can request an API key from the RStudio Connect UI. See the [user guide](https://docs.rstudio.com/connect/user/cookbook.html#cookbook-configuring-your-scripts) for more information. 
 * `CONNECT_SERVER`: This is the URL for your server. (e.g. "https://connect.example.com/").
 * `name`: A unique identifier for the content that is defined by the user.
 
-#### Outputs
+#### API Outputs
 
 Each API returns an identifier that is used in the next API call.
 
@@ -59,11 +71,11 @@ Set your working directory to the app directory. Deployments work better when th
 
 ***
 
-### 1. Describe the environment
+### 1. Build the bundle
 
 ***
 
-#### Manifest
+#### Create a manifest
 
 The manifest defines your development environment. This is done with an R function. The manifest includes things like your R version and package information.
 
@@ -73,13 +85,7 @@ rsconnect::writeManifest(appFiles = "app.R")
 
 The manifest is written to `manifest.json` in your app directory.
 
-***
-
-### 2. Bundle and ship
-
-***
-
-#### Bundle all the files
+#### Bundle the content and manifest
 
 Bundle your content code and the manifest into a tarball.
 
@@ -89,9 +95,15 @@ tar -czf bundle.tar.gz manifest.json app.R
 
 Your code and the manifest are stored in `bundle.tar.gz`.
 
-#### Retrieve a placeholder
+***
 
-Using the `POST /content` API, retrieve a globally unique identifier that will act as a placeholder for your content.
+### 2. Upload the bundle
+
+***
+
+#### Create an item placeholder
+
+Using the `POST /content` API, retrieve a globally unique identifier that will act as an item placeholder for your content.
 
 * Inputs: `CONNECT_API_KEY`, `CONNECT_SERVER`, `name`
 * Output: `CONTENT_GUID`
@@ -106,7 +118,7 @@ curl --silent --show-error -L --max-redirs 0 --fail -X POST \
 Save the output for `guid` with the `CONTENT_GUID` environment variable.
 
 ```{r include=FALSE}
-Sys.setenv(CONTENT_GUID="86902d4d-3bca-4aae-84a8-101781d7fcfd")
+Sys.setenv(CONTENT_GUID="3ddc49a0-9cea-4493-b645-bef0ca25a7bd")
 ```
 
 #### Upload the bundle
@@ -126,12 +138,12 @@ curl --silent --show-error -L --max-redirs 0 --fail -X POST \
 Save the output for `bundle_id` with the `BUNDLE_ID` environment variable.
 
 ```{r include=FALSE}
-Sys.setenv(BUNDLE_ID="25054")
+Sys.setenv(BUNDLE_ID="25103")
 ```
 
 ***
 
-### 3. Recreate the environment
+### 3. Deploy the bundle
 
 ***
 
@@ -152,7 +164,7 @@ curl --silent --show-error -L --max-redirs 0 --fail -X POST \
 Save the output for `task_id` with the `TASK` environment variable.
 
 ```{r include=FALSE}
-Sys.setenv(TASK="ODNZzhYvboNrwvRb")
+Sys.setenv(TASK="xyVPqRuhnFgb9iKf")
 ```
 
 #### Verify the deployment
@@ -160,16 +172,24 @@ Sys.setenv(TASK="ODNZzhYvboNrwvRb")
 Verify that the bundle finished. Use `first` to define what part of the output you would like to capture (`first=0` by default).
 
 ```{bash}
-curl --silent --show-error -L --max-redirs 0 --fail \
+curl --silent --show-error -L --max-redirs 0 --fail -X GET \
     -H "Authorization: Key ${CONNECT_API_KEY}" \
     "${CONNECT_SERVER}__api__/v1/experimental/tasks/${TASK}?wait=1&first=0"
 ```
 
+***
+
+### Navigate to your web browser
+
+***
+
 #### Open in RStudio Connect
 
-Congratulations! Click the links to open the deployed assets in RStudio Connect.
+Congratulations! You can now open your deployed content in RStudio Connect.
 
-* [Open in UI](`r paste0(Sys.getenv("CONNECT_SERVER"), "connect/#/apps/", Sys.getenv("CONTENT_GUID"))`)
-* [Open solo](`r paste0(Sys.getenv("CONNECT_SERVER"), "content/", Sys.getenv("CONTENT_GUID"))`)
-
-
+```{bash}
+# Open in RStudio Connect UI
+echo "${CONNECT_SERVER}connect/#/apps/${CONTENT_GUID}"
+# Open in solo mode
+echo "${CONNECT_SERVER}content/${CONTENT_GUID}"
+```
