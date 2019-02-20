@@ -6,12 +6,16 @@ Programmatic deployment with the RStudio Connect API. See the [user guide](https
 
 Deployments involve describing the development environment then recreating the environment on RStudio Connect. 
 
-1. Describe the environment
+1. Build the bundle
     * `rsconnect::writeManifest()` - Create manifest
-2. Upload the bundle
     * `tar` -- Bundle all the files
+2. Upload the bundle
     * `POST /content` -- Retrieve a guid
     * `POST /upload` -- Upload the bundle 
-3. Recreate the environment
+3. Deploy the bundle
     * `POST /deploy` -- Deploy the bundle
-    * `/tasks` -- Verify deployment
+    * `GET /tasks` -- Verify deployment
+
+### Diagram
+
+![](diagram.png)
