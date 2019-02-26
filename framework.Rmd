@@ -1,0 +1,89 @@
+---
+title: RStudio Connect Deployments
+description: An overview of the framework
+author: Nathan Stephens
+date: 2/25/2019
+output: radix::radix_article
+---
+
+## Overview
+
+Data science is about accessing, understanding, and communicating insights about your data. Data science also involves building data products and deploying them in production. 
+
+Deployments your work when you want to:
+
+* Share your Shiny app with your organization.
+* Automatically render and distribute R Markdown reports on a set schedule.
+* Expose your R functions to other systems using a REST based Plumber API.
+* Host your Jupyter Notebooks.
+
+RStudio Connect is a publishing platform for all the work your team creates in R. With RStudio Connect, you can deploy your data products in a production environment. This document discusses considerations for deploying content in to RStudio Connect.
+
+### Reproducibility
+
+When you build a data product (e.g. Shiny applications) in R, your content depends on many other things in your environment. For example, R packages, a specific version of R, and many other things will be needed in the production environment once your content has been deployed. When you deploy content you want to reproduce the environment in the deployed location. **Our strategy is to reproduce the development environment as closely as possible in the production environment**.
+
+* [Building the manifest](https://docs.rstudio.com/connect/admin/appendix-deployment-guide.html#manifest)
+* [\<Doc on describing and recreating the environment\>]()
+
+### Deployment Process
+
+The deployment process follows three steps: **(1) Build; (2) Upload; and (3) Deploy**. In the first step, the environment is described in the manifest and all the necessary files are gathered into a single content bundle. In the second step, the content bundle is uploaded to the server. In the third step the manifest is parsed and the environment is restored as the content bundle is deployed on RStudio Connect. **All deployment methods follow these same three steps**.
+
+* [Programmatic deployment in R](https://docs.rstudio.com/connect/admin/appendix-deployment-guide.html)
+
+## Methods
+
+### I. Deployments with RStudio Connect APIs
+
+You can use the RStudio Connect APIs to programmatically deploy content to RStudio Connect. You should use the RStudio Connect APIs if you are using continuous integration with systems like Jenkins and Travis. The `content` API will upload and deploy content, while the `task` API will return status about recent activity. Note: The RStudio Connect APIs are experimental.
+
+* [Deployments with APIs](https://docs.rstudio.com/connect/user/cookbook.html#cookbook-deploying)
+
+### II. Programmatic deployments with R
+
+You can publish content directly from R using the `rsconnect` package. Use the `deployApp` function to publish. Metadata are stored in the `rsconnect` directory and the `.dcf` file. The `rsconnect` package deploys through a different set of APIs than the newer APIs in Method I.
+
+* [The rsconnect package as a deployment interface](https://cran.r-project.org/web/packages/rsconnect/index.html)
+
+### III. Push button publishing in RStudio
+
+The RStudio IDE has a feature that allows users to publish through the UI with push button publishing. Push button publishing relies on the `rsconnect` package.
+
+* [Push button publishing](https://docs.rstudio.com/connect/user/publishing.html)
+
+### Summary of methods
+
+&nbsp; | Method | Tool | Programmatic | Depends on R
+-|-------|------|:-----:|:------:
+I.  | Connect APIs | `/content` API | Yes | No 
+II. | Deploy with R | `rsconnect` R package | Yes | Yes
+III.| Push Button | RStudio IDE | No | Yes
+
+
+## In production
+
+### RStudio Connect APIs
+
+Use the RStudio Connect APIs to deploy content in production...
+
+* [RStudio Connect Content API](https://docs.rstudio.com/connect/1.7.0/api/#content)
+* [RStudio Connect API tutorial](https://colorado.rstudio.com/rsc/content/2153/deploy-app.nb.html)
+
+### Dev-Test-Prod
+
+You can use the RStudio Connect APIs to set up a deployment environment for R...
+
+* [\<Doc on Dev-Test-Prod\>]()
+* [Connect APIs example](https://github.com/rstudio/connect-api-deploy-shiny)
+
+### Continuous integration
+
+In order to use these in a workflow you will want to automate and use git...
+
+* [Continuous integration](https://solutions.rstudio.com/deploy/deploy/)
+* [Auto deploy example](https://github.com/koverholt/auto-deploy-rstudio-connect)
+* [Deploy with Github and Jenkins example](https://medium.com/@kelly.obriant/rstudio-connect-deployments-with-github-webhooks-and-jenkins-c0dd8a82b986)
+
+
+

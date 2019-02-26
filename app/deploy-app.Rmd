@@ -48,7 +48,7 @@ The bundle is a tarball that contains the R code, other data files, and the mani
 You will need to supply three inputs to the API's. For convenience in later steps you should **set these inputs as environment variables**.
 
 ```{r, include = FALSE}
-Sys.setenv(NAME = "dynamic12")
+Sys.setenv(NAME = "dynamic13")
 # Sys.setenv(CONNECT_API_KEY = "********************************")
 # Sys.setenv(CONNECT_SERVER = "https://connect.example.com/")
 ```
@@ -118,7 +118,7 @@ curl --silent --show-error -L --max-redirs 0 --fail -X POST \
 Save the output for `guid` with the `CONTENT_GUID` environment variable.
 
 ```{r include=FALSE}
-Sys.setenv(CONTENT_GUID="3ddc49a0-9cea-4493-b645-bef0ca25a7bd")
+Sys.setenv(CONTENT_GUID="2df1735b-354f-4d7f-aca3-27a94b32fed8")
 ```
 
 #### Upload the bundle
@@ -138,7 +138,7 @@ curl --silent --show-error -L --max-redirs 0 --fail -X POST \
 Save the output for `bundle_id` with the `BUNDLE_ID` environment variable.
 
 ```{r include=FALSE}
-Sys.setenv(BUNDLE_ID="25103")
+Sys.setenv(BUNDLE_ID="25123")
 ```
 
 ***
@@ -164,7 +164,7 @@ curl --silent --show-error -L --max-redirs 0 --fail -X POST \
 Save the output for `task_id` with the `TASK` environment variable.
 
 ```{r include=FALSE}
-Sys.setenv(TASK="xyVPqRuhnFgb9iKf")
+Sys.setenv(TASK="P4VUYlBF0wDVCovS")
 ```
 
 #### Verify the deployment
